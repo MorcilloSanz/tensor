@@ -966,29 +966,18 @@ Tensor* tensor_product(Tensor* lhs, Tensor* rhs) {
         break;
         case RANK_2:
         {
-            Tensor* tensor = create_tensor_rank4(rhs->cols, lhs->rows, lhs->cols, lhs->rows);
+            Tensor* tensor = create_tensor_rank4(rhs->cols, rhs->rows, lhs->cols, lhs->rows);
 
-            for(uint8_t i = 0; i < lhs->cols; i ++) {
-                for(uint8_t j = 0; j < lhs->rows; j ++) {
-                    
-                    double lhs_value = get(lhs, i, j);
+            for(uint8_t t = 0; t < tensor->time; t ++) {
+                for(uint8_t k = 0; k < tensor->depth; k ++) {
 
-                    Matrix* submatrix = create_copy(rhs);
-                    product_scalar(submatrix, lhs_value);
-
-                    for(uint8_t n = 0; n < submatrix->cols; n ++) {
-                        for(uint8_t m = 0; m < submatrix->rows; m ++) {
-                            
-                            double value = get(submatrix, n, m);
-
-                            uint8_t pos_i = i * submatrix->cols + n;
-                            uint8_t pos_j = j * submatrix->rows + m;
-
-                            set(tensor, value, pos_i, pos_j, i, j);
+                    for(uint8_t j = 0; j < tensor->rows; j ++) {
+                        for(uint8_t i = 0; i < tensor->cols; i ++) {
+                        
+                            double value = get(lhs, k, t) * get(rhs, i, j);
+                            set(tensor, value, i, j, k, t);
                         }
                     }
-                    
-                    destroy_tensor(submatrix);
                 }
             }
 

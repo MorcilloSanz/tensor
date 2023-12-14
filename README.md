@@ -1,6 +1,10 @@
 # Talg (Tensor algebra library)
 
+> **Warning:** still in development
+
 Tensor algebra library written in a single header file in C (-std=c11).
+
+![](img/tensor.png)
 
 ## Table of contents
 
@@ -15,9 +19,12 @@ Tensor algebra library written in a single header file in C (-std=c11).
 - [Dot product](#dot-product)
 - [Cross product](#cross-product)
 - [Transpose](#transpose)
-- [Inverse](#inverse)
+- [Cofactor matrix](#cofactor-matrix)
 - [Determinant](#determinant)
+- [Inverse](#inverse)
 - [Transform vector](#transform-vector)
+- [Eigenvalues and eigenvectors TODO]()
+- [Solve linear system TODO]()
 
 ## Create algebraic structures
 Talg allows you to create vectors, matrices and tesors (row-major order):
@@ -116,15 +123,18 @@ double value = get(matrix, 0, 1);
 
 **Rank 3 tensors:** *set(tensor, value, i, j, k)* and *get(matrix, i, j, k)* where *i* is the column, *j* is the row and *k* is the depth.
 ```c
-Tensor* tensor1 = create_tensor_rank3(3, 3, 3);
+Tensor* tensor = create_tensor_rank3(3, 3, 3);
 
-set(tensor1, 2.50, 0, 0, 0);
-set(tensor1, 3.25, 2, 0, 1);
+set(tensor, 2.50, 0, 0, 0);
+set(tensor, 3.25, 2, 0, 1);
+```
+**Rank 4 tensors:** *set(tensor, value, i, j, k, t)* and *get(matrix, i, j, k, t)* where *i* is the column, *j* is the row, *k* is the depth and *t* is the time.
 
-Tensor* tensor2 = create_tensor_rank4(3, 2, 3, 4);
+```c
+Tensor* tensor = create_tensor_rank4(3, 2, 3, 4);
 
-set(tensor2, 4.0, 0, 0, 0, 0);
-set(tensor2, 5.5, 2, 0, 1, 2);
+set(tensor, 4.0, 0, 0, 0, 0);
+set(tensor, 5.5, 2, 0, 1, 2);
 
 double value = get(tensor2, 2, 0, 1, 2);
 ```
@@ -144,24 +154,18 @@ void sum_scalar(Tensor* lhs, double rhs);
 
 **Sum two tensors:** add the rhs tensor to the lhs tensor.
 ```c
-Matrix* matrix1 = create_matrix(3, 3);
-...
+Tensor* tensor1 = ...
+Tensor* tensor2 = ...
 
-Matrix* matrix2 = create_matrix(3, 3);
-...
-
-sum(matrix1, matrix2);
+sum(tensor1, tensor2);
 ```
 
 **Subtract two tensors:** subtracts the rhs tensor to the lhs tensor.
 ```c
-Matrix* matrix1 = create_matrix(3, 3);
-...
+Tensor* tensor1 = ...
+Tensor* tensor2 = ...
 
-Matrix* matrix2 = create_matrix(3, 3);
-...
-
-subtract(matrix1, matrix2);
+subtract(tensor1, tensor2);
 ```
 
 **Sum scalar to tensor:** sums a scalar to a tensor.
@@ -302,6 +306,29 @@ print_matrix(matrix);
 printf("\n");
 ```
 
+# Cofactor matrix
+Computes the cofactor matrix of a matrix
+
+```c
+Matrix* cofactor_matrix(Matrix* matrix);
+```
+
+# Determinant
+Computes the determinant of a matrix:
+
+```c
+double determinant(Matrix* matrix);
+```
+
+```c
+Matrix* matrix = create_matrix(3, 3);
+set(matrix, 1.0, 0, 0); set(matrix, 2.0, 1, 0); set(matrix,  3.0, 2, 0);
+set(matrix, 0.0, 0, 1); set(matrix, 3.0, 1, 1); set(matrix, -2.0, 2, 1);
+set(matrix, 7.0, 0, 2); set(matrix, 1.0, 1, 2); set(matrix,  4.0, 2, 2);
+
+double det = determinant(matrix);
+```
+
 # Inverse
 >**Info:** inverse is only available for matrices for the moment.
 
@@ -321,22 +348,6 @@ Matrix* inv = inverse(matrix);
 
 print_matrix(inv);
 printf("\n");
-```
-
-# Determinant
-Computes the determinant of a matrix:
-
-```c
-double determinant(Matrix* matrix);
-```
-
-```c
-Matrix* matrix = create_matrix(3, 3);
-set(matrix, 1.0, 0, 0); set(matrix, 2.0, 1, 0); set(matrix,  3.0, 2, 0);
-set(matrix, 0.0, 0, 1); set(matrix, 3.0, 1, 1); set(matrix, -2.0, 2, 1);
-set(matrix, 7.0, 0, 2); set(matrix, 1.0, 1, 2); set(matrix,  4.0, 2, 2);
-
-double det = determinant(matrix);
 ```
 
 # Transform vector
