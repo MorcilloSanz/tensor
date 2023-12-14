@@ -1,8 +1,8 @@
 # Talg (Tensor algebra library)
 
-> **Warning:** still in development
+Tensor algebra library written in a `single` header file in C (-std=c11).
 
-Tensor algebra library written in a single header file in C (-std=c11).
+>**Warning:** still in development
 
 ![](img/tensor.png)
 
@@ -20,11 +20,16 @@ Tensor algebra library written in a single header file in C (-std=c11).
 - [Cross product](#cross-product)
 - [Transpose](#transpose)
 - [Cofactor matrix](#cofactor-matrix)
+- [Adjugate matrix](#adjugate-matrix)
 - [Determinant](#determinant)
 - [Inverse](#inverse)
 - [Transform vector](#transform-vector)
-- [Eigenvalues and eigenvectors TODO]()
-- [Solve linear system TODO]()
+- [Singular value decomposition (SVD) -> TODO]()
+- [Eigenvalues and eigenvectors -> TODO]()
+- [Solve linear system -> TODO]()
+- [Jacobi method -> TODO]()
+- [Jacobi eigenvalue algorithm -> TODO]()
+
 
 ## Create algebraic structures
 Talg allows you to create vectors, matrices and tesors (row-major order):
@@ -45,6 +50,7 @@ Tensor* create_tensor_rank3(uint8_t cols, uint8_t rows, uint8_t depth);
 ```c
 Tensor* create_tensor_rank4(uint8_t cols, uint8_t rows, uint8_t depth, uint8_t time);
 ```
+**Higher rank tensors as data structures:** in the case of needing higher rank tensors to store data only, consider using arrays of tensors (Talg tensor operations only work up to rank 4)
 
 > **Important:** as these create methods allocates memory in the heap. It is important to free them once they are not useful anymore:
 
@@ -307,10 +313,17 @@ printf("\n");
 ```
 
 # Cofactor matrix
-Computes the cofactor matrix of a matrix
+Computes the cofactor matrix of a matrix:
 
 ```c
 Matrix* cofactor_matrix(Matrix* matrix);
+```
+
+# Adjugate matrix
+Computes the adjugate matrix of a matrix:
+
+```c
+Matrix* adjugate_matrix(Matrix* matrix);
 ```
 
 # Determinant
