@@ -1,16 +1,36 @@
 # Talg (Tensor algebra library)
 
-Tensor algebra library written in a `single` header file in C (-std=c11).
-
->**Warning:** still in development
+Tensor algebra library written in a `single` header file in C. The goal of this project is to create a tensor algebra library designed for `graphics programming`, that can also be useful in other areas such as machine and `deep learning` or `physics`.
+> It is written in C11 (-std=c11)
 
 ![](img/tensor.png)
 
+*Rank 3 tensor shape.*
+
+## Example
+
+```c
+Matrix* matrix = create_matrix(3, 3);
+
+set(matrix, 1.0, 0, 0); set(matrix, 2.0, 1, 0); set(matrix,  3.0, 2, 0);
+set(matrix, 0.0, 0, 1); set(matrix, 3.0, 1, 1); set(matrix, -2.0, 2, 1);
+set(matrix, 7.0, 0, 2); set(matrix, 1.0, 1, 2); set(matrix,  4.0, 2, 2);
+
+Matrix* inv = inverse(matrix);
+
+print_tensor(inv);
+
+destroy_tensor(inv);
+destroy_tensor(matrix);
+```
+
 ## Table of contents
 
-- [Create algebraic structures](#create-algebraic-structures)
+- [Create tensor](#create-tensor)
+- [Destroy tensor](#destroy-tensor)
 - [Create a copy of a tensor](#create-a-copy-of-a-tensor)
 - [Create identity matrix](#create-identity-matrix)
+- [Print tensor](#print-tensor)
 - [Set and get values](#set-and-get-values)
 - [Addition and subtraction](#addition-and-subtraction)
 - [Product](#product)
@@ -24,14 +44,15 @@ Tensor algebra library written in a `single` header file in C (-std=c11).
 - [Determinant](#determinant)
 - [Inverse](#inverse)
 - [Transform vector](#transform-vector)
-- [Singular value decomposition (SVD) -> TODO]()
-- [Eigenvalues and eigenvectors -> TODO]()
-- [Solve linear system -> TODO]()
-- [Jacobi method -> TODO]()
-- [Jacobi eigenvalue algorithm -> TODO]()
+- [**TODO** Subtensors]()
+- [**TODO** Singular value decomposition (SVD)]()
+- [**TODO** Eigenvalues and eigenvectors ]()
+- [**TODO** Solve linear system ]()
+- [**TODO** Jacobi method ]()
+- [**TODO** Jacobi eigenvalue algorithm]()
 
 
-## Create algebraic structures
+## Create tensor
 Talg allows you to create vectors, matrices and tesors (row-major order):
 
 **Create rank 1 tensor (vector):** creates a vector of dim *n*.
@@ -50,33 +71,13 @@ Tensor* create_tensor_rank3(uint8_t cols, uint8_t rows, uint8_t depth);
 ```c
 Tensor* create_tensor_rank4(uint8_t cols, uint8_t rows, uint8_t depth, uint8_t time);
 ```
-**Higher rank tensors as data structures:** in the case of needing higher rank tensors to store data only, consider using arrays of tensors (Talg tensor operations only work up to rank 4)
 
+## Destroy tensor
 > **Important:** as these create methods allocates memory in the heap. It is important to free them once they are not useful anymore:
 
 ```c
 void destroy_tensor(Tensor* tensor);
 ```
-
-Example:
-
-```c
-Matrix* matrix = create_matrix(3, 3);
-
-set(matrix, 1.0, 0, 0); set(matrix, 2.0, 1, 0); set(matrix,  3.0, 2, 0);
-set(matrix, 0.0, 0, 1); set(matrix, 3.0, 1, 1); set(matrix, -2.0, 2, 1);
-set(matrix, 7.0, 0, 2); set(matrix, 1.0, 1, 2); set(matrix,  4.0, 2, 2);
-
-Matrix* inv = inverse(matrix);
-
-print_matrix(inv);
-printf("\n");
-
-destroy_tensor(inv);
-destroy_tensor(matrix);
-```
-
-*As vector and matrices are tensors of rank 1 and 2, it is possible to write Tensor instead of Vector or Matrix.*
 
 ## Create a copy of a tensor
 Creates a copy of a tensor:
@@ -97,6 +98,13 @@ Matrix* create_identity(uint8_t cols);
 
 ```c
 Matrix* matrix = create_identity(4);
+```
+
+## Print tensor
+Prints a tensor of any rank:
+
+```c
+void print_tensor(Tensor* tensor);
 ```
 
 ## Set and get values
@@ -160,26 +168,49 @@ void sum_scalar(Tensor* lhs, double rhs);
 
 **Sum two tensors:** add the rhs tensor to the lhs tensor.
 ```c
-Tensor* tensor1 = ...
-Tensor* tensor2 = ...
+Tensor* tensor1 = create_tensor_rank3(3, 3, 3);
+
+set(tensor1, 2.5, 0, 0, 0);
+set(tensor1, 3.25, 2, 0, 1);
+
+Tensor* tensor2 = create_tensor_rank3(3, 3, 3);
+
+set(tensor2, 3.25, 0, 0, 0);
+set(tensor2, 2.5, 2, 0, 1);
 
 sum(tensor1, tensor2);
+
+print_tensor(tensor1);
+
+destroy_tensor(tensor1);
+destroy_tensor(tensor2);
 ```
 
 **Subtract two tensors:** subtracts the rhs tensor to the lhs tensor.
 ```c
-Tensor* tensor1 = ...
-Tensor* tensor2 = ...
+Tensor* tensor1 = create_tensor_rank3(3, 3, 3);
+
+set(tensor1, 2.5, 0, 0, 0);
+set(tensor1, 3.25, 2, 0, 1);
+
+Tensor* tensor2 = create_tensor_rank3(3, 3, 3);
+
+set(tensor2, 3.25, 0, 0, 0);
+set(tensor2, 2.5, 2, 0, 1);
 
 subtract(tensor1, tensor2);
+
+print_tensor(tensor1);
+
+destroy_tensor(tensor1);
+destroy_tensor(tensor2);
 ```
 
 **Sum scalar to tensor:** sums a scalar to a tensor.
 ```c
-Matrix* matrix1 = create_matrix(3, 3);
-...
+Matrix* matrix = create_identity(3);
 
-sum_scalar(matrix1, 2.0);
+sum_scalar(matrix, 2.0);
 ```
 
 ## Product
@@ -209,7 +240,7 @@ set(matrix2, 4.0, 0, 1); set(matrix2, 5.0, 1, 1); set(matrix2, 6.0, 2, 1);
 
 product(matrix1, matrix2);
 
-print_matrix(matrix1);
+print_tensor(matrix1);
 printf("\n");
 ```
 **Multiply scalar to tensor:** multiplies a scalar to a tensor.
@@ -228,14 +259,20 @@ void hadamard_product(Tensor* lhs, Tensor* rhs);
 
 ```c
 Vector* vector1 = create_vector(3);
-...
+
+set(vector1, 1.0, 0);
+set(vector1, 2.0, 1);
+set(vector1, 3.0, 2);
 
 Vector* vector2 = create_vector(3);
-...
+
+set(vector2, 3.0, 0);
+set(vector2, 2.0, 1);
+set(vector2, 1.0, 2);
 
 hadamard_product(vector1, vector2);
 
-printf("(%f,%f,%f)\n", get(vector1, 0), get(vector1, 1), get(vector1, 2));
+print_tensor(vector1);
 
 ```
 
@@ -246,15 +283,32 @@ Tensor* tensor_product(Tensor* lhs, Tensor* rhs);
 ```
 
 ```c
-Vector* vector1 = create_vector(3);
-...
+Matrix* matrix1 = create_matrix(2, 2);
 
-Vector* vector2 = create_vector(4);
-...
+set(matrix1, 1.0, 0, 0); set(matrix1, 2.0, 1, 0);
+set(matrix1, 3.0, 0, 1); set(matrix1, 4.0, 1, 1);
 
-Tensor* result = tensor_product(vector1, vector2);
+printf("Matrix1:\n");
+print_tensor(matrix1);
+printf("\n");
 
-print_matrix(result);
+Matrix* matrix2 = create_matrix(2, 2);
+
+set(matrix2, 5.0, 0, 0); set(matrix2, 6.0, 1, 0);
+set(matrix2, 7.0, 0, 1); set(matrix2, 8.0, 1, 1);
+
+printf("Matrix2:\n");
+print_tensor(matrix2);
+printf("\n");
+
+Tensor* tensor = tensor_product(matrix1, matrix2);
+
+printf("Rank 4 tensor:\n");
+print_tensor(tensor);
+
+destroy_tensor(matrix1);
+destroy_tensor(matrix2);
+destroy_tensor(tensor);
 ```
 
 # Dot product
@@ -266,10 +320,16 @@ double dot_product(Tensor* lhs, Tensor* rhs);
 
 ```c
 Vector* vector1 = create_vector(3);
-...
+
+set(vector1, 1.0, 0);
+set(vector1, 2.0, 1);
+set(vector1, 3.0, 2);
 
 Vector* vector2 = create_vector(3);
-...
+
+set(vector2, 3.0, 0);
+set(vector2, 2.0, 1);
+set(vector2, 1.0, 2);
 
 double dot = dot_product(vector1, vector2);
 ```
@@ -283,10 +343,16 @@ Vector* cross_product(Vector* lhs, Vector* rhs);
 ```
 ```c
 Vector* vector1 = create_vector(3);
-...
+
+set(vector1, 1.0, 0);
+set(vector1, 2.0, 1);
+set(vector1, 3.0, 2);
 
 Vector* vector2 = create_vector(3);
-...
+
+set(vector2, 3.0, 0);
+set(vector2, 2.0, 1);
+set(vector2, 1.0, 2);
 
 Vector* cross = cross_product(vector1, vector2);
 ```
@@ -303,12 +369,13 @@ void transpose(Matrix* matrix);
 
 ```c
 Matrix* matrix = create_matrix(3, 2);
+
 set(matrix, 4.0, 0, 0); set(matrix, 5.0, 1, 0); set(matrix, 6.0, 2, 0);
 set(matrix, 7.0, 0, 1); set(matrix, 8.0, 1, 1); set(matrix, 9.0, 2, 1);
 
 transpose(matrix);
 
-print_matrix(matrix);
+print_tensor(matrix);
 printf("\n");
 ```
 
@@ -335,6 +402,7 @@ double determinant(Matrix* matrix);
 
 ```c
 Matrix* matrix = create_matrix(3, 3);
+
 set(matrix, 1.0, 0, 0); set(matrix, 2.0, 1, 0); set(matrix,  3.0, 2, 0);
 set(matrix, 0.0, 0, 1); set(matrix, 3.0, 1, 1); set(matrix, -2.0, 2, 1);
 set(matrix, 7.0, 0, 2); set(matrix, 1.0, 1, 2); set(matrix,  4.0, 2, 2);
@@ -353,13 +421,14 @@ Matrix* inverse(Matrix* matrix);
 
 ```c
 Matrix* matrix = create_matrix(3, 3);
+
 set(matrix, 1.0, 0, 0); set(matrix, 2.0, 1, 0); set(matrix,  3.0, 2, 0);
 set(matrix, 0.0, 0, 1); set(matrix, 3.0, 1, 1); set(matrix, -2.0, 2, 1);
 set(matrix, 7.0, 0, 2); set(matrix, 1.0, 1, 2); set(matrix,  4.0, 2, 2);
 
 Matrix* inv = inverse(matrix);
 
-print_matrix(inv);
+print_tensor(inv);
 printf("\n");
 ```
 
@@ -372,9 +441,17 @@ void transform(Vector* vector, Matrix* matrix);
 
 ```c
 Vector* vector = create_vector(4);
-...
 
-Matrix* matrix = create_matrix(4, 4);
+set(vector, 1.0, 0);
+set(vector, 2.0, 1);
+set(vector, 3.0, 2);
+set(vector, 1.0, 3);
+
+Matrix* matrix = create_identity(4);
+product_scalar(matrix, 2.0);
+set(matrix, 1.0, 3, 3);
 
 transform(vector, matrix);
+
+print_tensor(vector);
 ```

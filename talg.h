@@ -402,11 +402,11 @@ double determinant(Matrix* matrix);
 Matrix* inverse(Matrix* matrix);
 
 /**
- * @brief Prints a matrix
+ * @brief Prints a tensor
  * 
- * @param matrix Matrix pointer
+ * @param tensor Tensor pointer
 */
-void print_matrix(Matrix* matrix);
+void print_tensor(Tensor* tensor);
 
 /**
  * @brief Destroys a tensor
@@ -1197,15 +1197,26 @@ Matrix* inverse(Matrix* matrix) {
 }
 
 /**
- * @brief Prints a matrix
+ * @brief Prints a tensor
  * 
- * @param matrix Matrix pointer
+ * @param tensor Tensor pointer
 */
-void print_matrix(Matrix* matrix) {
+void print_tensor(Tensor* tensor) {
 
-    for(uint8_t j = 0; j < matrix->rows; j ++) {
-        for(uint8_t i = 0; i < matrix->cols; i ++) {
-            printf("%f ", get(matrix, i, j));
+    for(uint8_t t = 0; t < tensor->time; t ++) {
+        for(uint8_t j = 0; j < tensor->rows; j ++) {
+
+            for(uint8_t k = 0; k < tensor->depth; k ++) {
+                for(uint8_t i = 0; i < tensor->cols; i ++) {
+
+                    if(tensor->tensor_rank == RANK_1)
+                        printf("%f ", get(tensor, j));
+                    else
+                        printf("%f ", get(tensor, i, j, k, t));
+                }
+                printf("\t");
+            }
+            printf("\n");
         }
         printf("\n");
     }
