@@ -1,28 +1,9 @@
 # Talg (Tensor algebra library)
 
-Tensor algebra library written in a `single` header file in C. The goal of this project is to create a tensor algebra library designed for `graphics programming`, that can also be useful in other areas such as machine and `deep learning` or `physics`.
+Tensor algebra library written in a `single` header file in C. The goal of this project is to create a tensor algebra library designed for `graphics programming`, that can also be useful in other areas such as `deep learning` or `physics`.
 > It is written in C11 (-std=c11)
 
 ![](img/tensor.png)
-
-*Rank 3 tensor shape.*
-
-## Example
-
-```c
-Matrix* matrix = create_matrix(3, 3);
-
-set(matrix, 1.0, 0, 0); set(matrix, 2.0, 1, 0); set(matrix,  3.0, 2, 0);
-set(matrix, 0.0, 0, 1); set(matrix, 3.0, 1, 1); set(matrix, -2.0, 2, 1);
-set(matrix, 7.0, 0, 2); set(matrix, 1.0, 1, 2); set(matrix,  4.0, 2, 2);
-
-Matrix* inv = inverse(matrix);
-
-print_tensor(inv);
-
-destroy_tensor(inv);
-destroy_tensor(matrix);
-```
 
 ## Table of contents
 
@@ -430,6 +411,9 @@ Matrix* inv = inverse(matrix);
 
 print_tensor(inv);
 printf("\n");
+
+destroy_tensor(inv);
+destroy_tensor(matrix);
 ```
 
 # Transform vector
