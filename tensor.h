@@ -66,23 +66,41 @@ Vector* create_vector(int n);
 /**
  * @brief Creates a matrix.
  * 
- * @param rows number of rows of the matrix.
  * @param cols number of cols of the matrix.
+ * @param rows number of rows of the matrix.
  * 
  * @return The matrix.
 */
 Matrix* create_matrix(uint8_t cols, uint8_t rows);
 
 /**
+ * @brief Creates a identity matrix.
+ * 
+ * @param n number of rows and cols of the matrix.
+ * 
+ * @return The matrix.
+*/
+Matrix* create_indentity(uint8_t n);
+
+/**
  * @brief Creates a rank 3 tensor.
  * 
- * @param rows number of rows of the tensor.
  * @param cols number of cols of the tensor.
+ * @param rows number of rows of the tensor.
  * @param depth depth of the tensor.
  * 
  * @return The tensor.
 */
-Tensor* create_tensor_rank3(uint8_t rows, uint8_t cols, uint8_t depth);
+Tensor* create_tensor_rank3(uint8_t cols, uint8_t rows, uint8_t depth);
+
+/**
+ * @brief Creates a copy of a tensor.
+ * 
+ * @param tensor the tensor.
+ * 
+ * @return The copy of the tensor.
+*/
+Tensor* create_copy(Tensor* tensor);
 
 /**
  * @brief Sets a value at a given position of the tensor.
@@ -308,9 +326,45 @@ Matrix* create_matrix(uint8_t cols, uint8_t rows) {
     return matrix;
 }
 
-Tensor* create_tensor_rank3(uint8_t rows, uint8_t cols, uint8_t depth) {
-    Tensor* tensor = create_tensor(3, rows, cols, depth);
+Matrix* create_indentity(uint8_t n) {
+
+    Matrix* matrix = create_matrix(n, n);
+
+    for(int i = 0; i < n; i++) {
+        for(int j = 0; j < n; j ++) {
+            if(i == j)
+                set_value(matrix, 1.0, i, j);
+        }
+    }
+
+    return matrix;
+}
+
+Tensor* create_tensor_rank3(uint8_t cols, uint8_t rows, uint8_t depth) {
+    Tensor* tensor = create_tensor(3, cols, rows, depth);
     return tensor;
+}
+
+Tensor* create_copy(Tensor* tensor) {
+
+    Tensor* copy_tensor = (Tensor*)malloc(sizeof(Tensor));
+
+    int* shape = (int*)malloc(sizeof(int) * tensor->rank);
+    for(int i = 0; i < tensor->rank; i ++)
+        shape[i] = tensor->shape[i];
+
+    copy_tensor->rank = tensor->rank;
+    copy_tensor->shape = shape;
+    
+    size_t length = 1;
+    for(int i = 0; i < tensor->rank; i ++)
+        length *= tensor->shape[i];
+
+    copy_tensor->data = (double*)malloc(sizeof(double) * length);
+    for(int i = 0; i < length; i ++)
+        copy_tensor->data[i] = tensor->data[i];
+
+    return copy_tensor;
 }
 
 void set_value(Tensor* tensor, double value, ...) {
