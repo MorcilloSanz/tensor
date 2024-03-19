@@ -3,12 +3,6 @@
 Tensor algebra library in a single header file in C11 for `graphics programming`, `machine` and `deep learning` and `physics`.
 > Still under development.
 
-<style>
-td, th {
-   border: none!important;
-}
-</style>
-
 <table>
     <tr>
         <td>
