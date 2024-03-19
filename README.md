@@ -1,9 +1,21 @@
 # tensor
 
 Tensor algebra library in a single header file in C11 for `graphics programming`, `machine` and `deep learning` and `physics`.
+> Still under development.
 
-* Vectors, matrices and rank 3 and higher rank tensors.
-* Linear algebra and tensor algebra operations.
+<table>
+    <tr>
+        <td>
+            <ul>
+                <li>Vectors, matrices, rank 3 and higher rank tensors.</li>
+                <li>Linear algebra and tensor algebra operations.</li>
+                <li>Pure C code, easy to integrate in C++ or other languajes using bindings.</li>
+                <li>Only one header file.</li>
+            </ul>
+        <td>
+        <td><img src="img/tensor.png"/></td>
+    </tr>
+</table>
 
 Take a look at [tensor wiki](https://github.com/MorcilloSanz/tensor/wiki) for reading the docs.
 
@@ -14,9 +26,6 @@ set_value(matrix, 2.0, 3, 0);
 set_value(matrix, 3.0, 3, 1);
 set_value(matrix, 4.0, 3, 2);
 
-printf("Matrix:\n");
-print_tensor(matrix);
-
 Vector* vector = create_vector(4);
 set_value(vector, 1.0, 0);
 set_value(vector, 1.0, 1);
@@ -24,8 +33,6 @@ set_value(vector, 1.0, 2);
 set_value(vector, 1.0, 3);
 
 transform(vector, matrix);
-
-printf("Vector:\n");
 print_tensor(vector);
 
 destroy_tensor(matrix);
@@ -40,7 +47,6 @@ set_value(matrix, 3.0, 3, 1);
 set_value(matrix, 4.0, 3, 2);
 
 Matrix* inv = inverse(matrix);
-
 matmul(matrix, inv);
 print_tensor(matrix);
 
@@ -56,4 +62,5 @@ set_value(tensor, 2.0, 1, 1, 1);
 set_value(tensor, 3.0, 2, 2, 2);
 
 print_tensor(tensor);
+destroy_tensor(tensor);
 ```
