@@ -22,9 +22,9 @@ Take a look at [tensor wiki](https://github.com/MorcilloSanz/tensor/wiki) for re
 ## Transform vector example
 ```c
 Matrix* matrix = create_indentity(4);
-set_value(matrix, 2.0, 3, 0);
-set_value(matrix, 3.0, 3, 1);
-set_value(matrix, 4.0, 3, 2);
+set_value(matrix, 2.0, 0, 3);
+set_value(matrix, 3.0, 1, 3);
+set_value(matrix, 4.0, 2, 3);
 
 Vector* vector = create_vector(4);
 set_value(vector, 1.0, 0);
