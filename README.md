@@ -33,7 +33,7 @@ set_value(vector, 1.0, 2);
 set_value(vector, 1.0, 3);
 
 transform(vector, matrix);
-print_tensor(vector);
+print_vector(vector);
 
 destroy_tensor(matrix);
 destroy_tensor(vector);
@@ -42,9 +42,9 @@ destroy_tensor(vector);
 ## Inverse of a matrix example
 ```c
 Matrix* matrix = create_indentity(4);
-set_value(matrix, 2.0, 3, 0);
-set_value(matrix, 3.0, 3, 1);
-set_value(matrix, 4.0, 3, 2);
+set_value(matrix, 2.0, 0, 3);
+set_value(matrix, 3.0, 1, 3);
+set_value(matrix, 4.0, 2, 3);
 
 Matrix* inv = inverse(matrix);
 matmul(matrix, inv);

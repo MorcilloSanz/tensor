@@ -23,6 +23,10 @@
 
     tensor (tensor algebra library in a single header file in C) 
     - Use at least C11 (-std=c11)
+
+    WARNING:
+    - Positions in matrices are of the form (j,i) where j is the row index and i 
+      the column index.
 */
 
 #pragma once
@@ -275,8 +279,22 @@ double determinant(Matrix* matrix);
 Matrix* inverse(Matrix* matrix);
 
 /**
- * @brief Prints a tensor.
- * @warning Rank 4 or less.
+ * @brief Prints a vector.
+ * 
+ * @param vector the vector.
+*/
+void print_vector(Vector* vector);
+
+/**
+ * @brief Prints a matrix.
+ * 
+ * @param matrix the matrix.
+*/
+void print_matrix(Matrix* matrix);
+
+/**
+ * @brief Prints a tensor (DEPRECATED).
+ * @deprecated
  * 
  * @param tensor the tensor.
 */
@@ -701,6 +719,25 @@ Matrix* inverse(Matrix* matrix) {
     product_scalar(inv, inv_determinant);
 
     return inv;
+}
+
+void print_vector(Vector* vector) {
+
+    printf("(");
+    for(int j = 0; j < vector->shape[0]; j ++) {
+        if(j < vector->shape[0] - 1) printf("%f,", get_value(vector, j));
+        else printf("%f)\n", get_value(vector, j));
+    }
+}
+
+void print_matrix(Matrix* matrix) {
+
+    for(int j = 0; j < matrix->shape[0]; j ++) {
+        for(int i = 0; i < matrix->shape[1]; i ++) {
+            printf("%f ", get_value(matrix, j, i));
+        }
+        printf("\n");
+    }
 }
 
 void print_tensor(Tensor* tensor) {
