@@ -61,6 +61,12 @@ set_value(tensor, 1.0, 0, 0, 0);
 set_value(tensor, 2.0, 1, 1, 1);
 set_value(tensor, 3.0, 2, 2, 2);
 
+printf("Tensor shape = (");
+for(int i = 0; i < tensor->rank; i ++) {
+    if(i < tensor->rank - 1) printf("%d,", tensor->shape[i]);
+    else printf("%d)\n", tensor->shape[i]);
+}
+
 print_tensor(tensor);
 destroy_tensor(tensor);
 ```
