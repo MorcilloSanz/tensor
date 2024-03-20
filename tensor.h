@@ -23,10 +23,6 @@
 
     tensor (tensor algebra library in a single header file in C) 
     - Use at least C11 (-std=c11)
-
-    WARNING:
-    - Positions in matrices are of the form (j,i) where j is the row index and i 
-      the column index.
 */
 
 #pragma once
@@ -220,27 +216,26 @@ Vector* cross_product(Vector* lhs, Vector* rhs);
 void transform(Vector* vector, Matrix* matrix);
 
 /**
- * @brief Calculates the minor of a matrix in a position (j,i) of the matrix.
+ * @brief Calculates the minor of a matrix in a position (row,col) of the matrix.
  * 
  * @param matrix the matrix.
- * @param j row.
- * @param i column.
+ * @param row the row index.
+ * @param col the column index.
  * 
  * @return The minor.
  */
-double minor(Matrix* matrix, uint8_t j, uint8_t i);
+double minor(Matrix* matrix, uint8_t row, uint8_t col);
 
 /**
- * @brief Calculates the cofactor of a matrix in a position (j,i) of the matrix.
+ * @brief Calculates the cofactor of a matrix in a position (row,col) of the matrix.
  * 
  * @param matrix the matrix.
- * 
- * @param j row.
- * @param i column.
+ * @param row the row index.
+ * @param col the column index.
  * 
  * @return The cofactor.
  */
-double cofactor(Matrix* matrix, uint8_t j, uint8_t i);
+double cofactor(Matrix* matrix, uint8_t row, uint8_t col);
 
 /**
  * @brief Computes the cofactor matrix of a matrix.
@@ -349,10 +344,10 @@ Matrix* create_indentity(uint8_t n) {
 
     Matrix* matrix = create_matrix(n, n);
 
-    for(int i = 0; i < n; i++) {
-        for(int j = 0; j < n; j ++) {
-            if(i == j)
-                set_value(matrix, 1.0, i, j);
+    for(int c = 0; c < n; c++) {
+        for(int r = 0; r < n; r ++) {
+            if(c == r)
+                set_value(matrix, 1.0, c, r);
         }
     }
 
@@ -432,9 +427,9 @@ void transpose(Matrix* matrix) {
 
     Matrix* transposeMatrix = create_matrix(matrix->shape[1], matrix->shape[0]);
 
-    for(uint8_t j = 0; j < transposeMatrix->shape[0]; j ++){
-        for(uint8_t i = 0; i < transposeMatrix->shape[1]; i ++)
-            set_value(transposeMatrix, get_value(matrix, i, j), j, i);
+    for(uint8_t r = 0; r < transposeMatrix->shape[0]; r ++){
+        for(uint8_t c = 0; c < transposeMatrix->shape[1]; c ++)
+            set_value(transposeMatrix, get_value(matrix, c, r), r, c);
     }
 
     matrix->shape[0] = transposeMatrix->shape[0];
@@ -491,14 +486,14 @@ void matmul(Matrix* lhs, Matrix* rhs) {
 
     Matrix* result = create_matrix(rhs->shape[1], lhs->shape[0]);
 
-    for(uint8_t j = 0; j < lhs->shape[0]; j ++) {
-        for(uint8_t i = 0; i < rhs->shape[1]; i ++) {
+    for(uint8_t r = 0; r < lhs->shape[0]; r ++) {
+        for(uint8_t c = 0; c < rhs->shape[1]; c ++) {
 
-            double mij = 0.0;
+            double mir = 0.0;
             for(int k = 0; k < lhs->shape[1]; k ++)
-                mij += get_value(rhs, k, j) * get_value(lhs, i, k);
+                mir += get_value(rhs, k, r) * get_value(lhs, c, k);
 
-            set_value(result, mij, j, i);
+            set_value(result, mir, r, c);
         }
     }
 
@@ -539,11 +534,11 @@ Tensor* tensor_product(Tensor* lhs, Tensor* rhs) {
         {
             Matrix* matrix = create_matrix(rhs->shape[0], lhs->shape[0]);
 
-            for(uint8_t j = 0; j < matrix->shape[0]; j ++) {
-                for(uint8_t i = 0; i < matrix->shape[1]; i ++) {
+            for(uint8_t r = 0; r < matrix->shape[0]; r ++) {
+                for(uint8_t c = 0; c < matrix->shape[1]; c ++) {
                 
-                    double value = get_value(lhs, j) * get_value(rhs, i);
-                    set_value(matrix, value, i, j);
+                    double value = get_value(lhs, r) * get_value(rhs, c);
+                    set_value(matrix, value, r, c);
                 }
             }
 
@@ -557,11 +552,11 @@ Tensor* tensor_product(Tensor* lhs, Tensor* rhs) {
             for(uint8_t t = 0; t < tensor->shape[3]; t ++) {
                 for(uint8_t k = 0; k < tensor->shape[2]; k ++) {
 
-                    for(uint8_t j = 0; j < tensor->shape[0]; j ++) {
-                        for(uint8_t i = 0; i < tensor->shape[1]; i ++) {
+                    for(uint8_t r = 0; r < tensor->shape[0]; r ++) {
+                        for(uint8_t c = 0; c < tensor->shape[1]; c ++) {
                         
-                            double value = get_value(lhs, k, t) * get_value(rhs, i, j);
-                            set_value(tensor, value, i, j, k, t);
+                            double value = get_value(lhs, k, t) * get_value(rhs, c, r);
+                            set_value(tensor, value, c, r, k, t);
                         }
                     }
                 }
@@ -619,17 +614,17 @@ void transform(Vector* vector, Matrix* matrix) {
 
     double* values = (double*)malloc(sizeof(double) * matrix->shape[0]);
 
-    for(int j = 0; j < matrix->shape[0]; j ++) {
+    for(int r = 0; r < matrix->shape[0]; r ++) {
 
         Vector* row_vector = create_vector(matrix->shape[1]);
 
-        for(int i = 0; i < matrix->shape[1]; i ++) {
-            double value = get_value(matrix, j, i);
-            set_value(row_vector, value, i);
+        for(int c = 0; c < matrix->shape[1]; c ++) {
+            double value = get_value(matrix, r, c);
+            set_value(row_vector, value, c);
         }
         
         double value = dot_product(row_vector, vector);
-        values[j] = value;
+        values[r] = value;
 
         destroy_tensor(row_vector);
     }
@@ -637,22 +632,22 @@ void transform(Vector* vector, Matrix* matrix) {
     vector->shape[0] = matrix->shape[0];
     vector->data = (double*)realloc(vector->data, vector->shape[0]);
 
-    for(int i = 0; i < vector->shape[0]; i++) 
-        set_value(vector, values[i], i);
+    for(int c = 0; c < vector->shape[0]; c++) 
+        set_value(vector, values[c], c);
 
     free(values);
 }
 
-double minor(Matrix* matrix, uint8_t j, uint8_t i) {
+double minor(Matrix* matrix, uint8_t row, uint8_t col) {
 
     Matrix* sub_matrix = create_matrix(matrix->shape[1] - 1, matrix->shape[1] - 1);
 
     uint8_t index = 0;
-    for(uint8_t row = 0; row < matrix->shape[0]; row ++) {
-        for(uint8_t col = 0; col < matrix->shape[1]; col ++) {
+    for(uint8_t r = 0; r < matrix->shape[0]; r ++) {
+        for(uint8_t c = 0; c < matrix->shape[1]; c ++) {
 
-            if(j != row && i != col) {
-                double value = get_value(matrix, row, col);
+            if(row != r && col != c) {
+                double value = get_value(matrix, r, c);
                 sub_matrix->data[index] = value;
                 index ++;
             }
@@ -665,10 +660,10 @@ double minor(Matrix* matrix, uint8_t j, uint8_t i) {
     return det;
 }
 
-double cofactor(Matrix* matrix, uint8_t j, uint8_t i) {
+double cofactor(Matrix* matrix, uint8_t row, uint8_t col) {
 
-    int sign = pow(-1.0, j + i);
-    double result =  sign * minor(matrix, j, i);
+    int sign = pow(-1.0, row + col);
+    double result =  sign * minor(matrix, row, col);
     return result;
 }
 
@@ -676,9 +671,9 @@ Matrix* cofactor_matrix(Matrix* matrix) {
 
     Matrix* cof_matrix = create_matrix(matrix->shape[0], matrix->shape[1]);
 
-    for(uint8_t j = 0; j < matrix->shape[0]; j ++) {
-        for(uint8_t i = 0; i < matrix->shape[1]; i ++)
-            set_value(cof_matrix, cofactor(matrix, j, i), j, i);
+    for(uint8_t r = 0; r < matrix->shape[0]; r ++) {
+        for(uint8_t c = 0; c < matrix->shape[1]; c ++)
+            set_value(cof_matrix, cofactor(matrix, r, c), r, c);
     }
 
     return cof_matrix;
@@ -702,9 +697,9 @@ double determinant(Matrix* matrix) {
 
     double result = 0.0;
 
-    for(uint8_t j = 0; j < matrix->shape[0]; j ++) {
-        double cof = cofactor(matrix, j, 0);
-        result += get_value(matrix, j, 0) * cof; 
+    for(uint8_t r = 0; r < matrix->shape[0]; r ++) {
+        double cof = cofactor(matrix, r, 0);
+        result += get_value(matrix, r, 0) * cof; 
     }
 
     return result;
@@ -724,17 +719,17 @@ Matrix* inverse(Matrix* matrix) {
 void print_vector(Vector* vector) {
 
     printf("(");
-    for(int j = 0; j < vector->shape[0]; j ++) {
-        if(j < vector->shape[0] - 1) printf("%f,", get_value(vector, j));
-        else printf("%f)\n", get_value(vector, j));
+    for(int r = 0; r < vector->shape[0]; r ++) {
+        if(r < vector->shape[0] - 1) printf("%f,", get_value(vector, r));
+        else printf("%f)\n", get_value(vector, r));
     }
 }
 
 void print_matrix(Matrix* matrix) {
 
-    for(int j = 0; j < matrix->shape[0]; j ++) {
-        for(int i = 0; i < matrix->shape[1]; i ++) {
-            printf("%f ", get_value(matrix, j, i));
+    for(int r = 0; r < matrix->shape[0]; r ++) {
+        for(int c = 0; c < matrix->shape[1]; c ++) {
+            printf("%f ", get_value(matrix, r, c));
         }
         printf("\n");
     }
@@ -747,15 +742,15 @@ void print_tensor(Tensor* tensor) {
         shape[i] = tensor->shape[i];
 
     for(uint8_t t = 0; t < shape[3]; t ++) {
-        for(uint8_t j = 0; j < shape[0]; j ++) {
+        for(uint8_t r = 0; r < shape[0]; r ++) {
 
             for(uint8_t k = 0; k < shape[2]; k ++) {
-                for(uint8_t i = 0; i < shape[1]; i ++) {
+                for(uint8_t c = 0; c < shape[1]; c ++) {
 
                     if(tensor->rank == 1)
-                        printf("%f ", get_value(tensor, j));
+                        printf("%f ", get_value(tensor, r));
                     else
-                        printf("%f ", get_value(tensor, i, j, k, t));
+                        printf("%f ", get_value(tensor, c, r, k, t));
                 }
                 printf("\t");
             }
