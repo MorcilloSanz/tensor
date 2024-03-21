@@ -1,9 +1,8 @@
 # tensor
 
-Tensor algebra library in a single header file in C11 for `graphics programming`, `machine` and `deep learning` and `physics`.
-> Still under development.
+Tensor algebra library in a single header file in C11 for `graphics programming`, `machine and deep learning` and `physics`.
 
-<img align = "right" src="img/tensor.png"/>
+<img align="right" width="220px" height="201px" src="img/tensor.png"/>
 
 * Vectors, matrices, rank 3 and higher rank tensors.
 
@@ -13,7 +12,7 @@ Tensor algebra library in a single header file in C11 for `graphics programming`
 
 * Only one header file.
 
-* Take a look at [tensor wiki](https://github.com/MorcilloSanz/tensor/wiki) for reading the docs.
+Take a look at [tensor wiki](https://github.com/MorcilloSanz/tensor/wiki) for reading the docs.
 
 ## Transform vector example
 ```c
