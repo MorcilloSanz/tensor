@@ -120,6 +120,15 @@ void set_value(Tensor* tensor, double value, ...);
 double get_value(Tensor* tensor, ...);
 
 /**
+ * @brief Returns the length of the data of the tensor.
+ * 
+ * @param tensor the tensor.
+ * 
+ * @return The length;
+*/
+unsigned int get_length(Tensor* tensor);
+
+/**
  * @brief Computes the transpose of a matrix.
  * 
  * @param matrix the matrix.
@@ -437,6 +446,15 @@ double get_value(Tensor* tensor, ...) {
     return value;
 }
 
+unsigned int get_length(Tensor* tensor) {
+
+    int length = 1;
+    for(int i = 0; i < tensor->rank; i ++) 
+        length *= tensor->shape[i];
+
+    return length;
+}
+
 void transpose(Matrix* matrix) {
 
     Matrix* transposeMatrix = create_matrix(matrix->shape[1], matrix->shape[0]);
@@ -457,9 +475,7 @@ void transpose(Matrix* matrix) {
 
 void sum_scalar(Tensor* tensor, double scalar) {
 
-    size_t length = 1;
-    for(int i = 0; i < tensor->rank; i ++)
-        length *= tensor->shape[i];
+    size_t length = get_length(tensor);
 
     for(int i = 0; i < length; i ++)
         tensor->data[i] += scalar;
@@ -467,9 +483,7 @@ void sum_scalar(Tensor* tensor, double scalar) {
 
 void product_scalar(Tensor* tensor, double scalar) {
 
-    size_t length = 1;
-    for(int i = 0; i < tensor->rank; i ++)
-        length *= tensor->shape[i];
+    size_t length = get_length(tensor);
 
     for(int i = 0; i < length; i ++)
         tensor->data[i] *= scalar;
@@ -541,49 +555,39 @@ void hadamard_product(Tensor* lhs, Tensor* rhs) {
 
 Tensor* tensor_product(Tensor* lhs, Tensor* rhs) {
 
-    if(lhs->rank == rhs->rank) {
+    Tensor* tensor = (Tensor*)malloc(sizeof(Tensor));
+    
+    tensor->rank = lhs->rank + rhs->rank;
+    tensor->shape = (int*)malloc(sizeof(int) * tensor->rank);
 
-        switch (lhs->rank) {
-        case 1 :
-        {
-            Matrix* matrix = create_matrix(rhs->shape[0], lhs->shape[0]);
-
-            for(uint8_t r = 0; r < matrix->shape[0]; r ++) {
-                for(uint8_t c = 0; c < matrix->shape[1]; c ++) {
-                
-                    double value = get_value(lhs, r) * get_value(rhs, c);
-                    set_value(matrix, value, r, c);
-                }
-            }
-
-            return matrix;
-        }    
-        break;
-        case 2:
-        {
-            Tensor* tensor = create_tensor(4, rhs->shape[1], rhs->shape[0], lhs->shape[1], lhs->shape[0]);
-
-            for(uint8_t t = 0; t < tensor->shape[3]; t ++) {
-                for(uint8_t k = 0; k < tensor->shape[2]; k ++) {
-
-                    for(uint8_t r = 0; r < tensor->shape[0]; r ++) {
-                        for(uint8_t c = 0; c < tensor->shape[1]; c ++) {
-                        
-                            double value = get_value(lhs, k, t) * get_value(rhs, c, r);
-                            set_value(tensor, value, c, r, k, t);
-                        }
-                    }
-                }
-            }
-
-            return tensor;
-        }
-        break;
-        }
+    for(int i = 0; i < tensor->rank; i ++) {
+        if(i < lhs->rank) tensor->shape[i] = lhs->shape[i];
+        else tensor->shape[i] = rhs->shape[i - lhs->rank];
     }
 
-    Vector* rank0 = create_vector(1);
-    return rank0;
+    int length_lhs = get_length(lhs);
+    int length_rhs = get_length(rhs);
+
+    tensor->data = (double*)malloc(sizeof(double) * length_lhs * length_rhs);
+
+    unsigned int index = 0;
+    for(int i = 0; i < length_lhs; i ++) {
+
+        Tensor* subtensor = create_copy(rhs);
+        product_scalar(subtensor, lhs->data[i]);
+
+        for(int j = 0; j < length_rhs; j ++) {
+            
+            double value = subtensor->data[j];
+            tensor->data[index] = value;
+
+            index ++;
+        }
+
+        destroy_tensor(subtensor);
+    }
+
+    return tensor;
 }
 
 double dot_product(Tensor* lhs, Tensor* rhs) {
