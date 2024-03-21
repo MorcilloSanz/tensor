@@ -43,7 +43,7 @@ set_value(matrix, 4.0, 2, 3);
 
 Matrix* inv = inverse(matrix);
 matmul(matrix, inv);
-print_tensor(matrix);
+print_matrix(matrix);
 
 destroy_tensor(matrix);
 destroy_tensor(inv);
@@ -62,6 +62,6 @@ for(int i = 0; i < tensor->rank; i ++) {
     else printf("%d)\n", tensor->shape[i]);
 }
 
-print_tensor(tensor);
+print_tensor_rank3(tensor);
 destroy_tensor(tensor);
 ```

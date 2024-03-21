@@ -288,7 +288,21 @@ void print_vector(Vector* vector);
 void print_matrix(Matrix* matrix);
 
 /**
- * @brief Prints a tensor (DEPRECATED).
+ * @brief Prints a rank 3 tensor.
+ * 
+ * @param tensor the tensor.
+*/
+void print_tensor_rank3(Tensor* tensor);
+
+/**
+ * @brief Prints a rank 4 tensor.
+ * 
+ * @param tensor the tensor.
+*/
+void print_tensor_rank4(Tensor* tensor);
+
+/**
+ * @brief Prints a tensor.
  * @deprecated
  * 
  * @param tensor the tensor.
@@ -718,6 +732,11 @@ Matrix* inverse(Matrix* matrix) {
 
 void print_vector(Vector* vector) {
 
+    if(vector->rank != 1) {
+        printf("Vector rank %d. Expected rank 1.\n", vector->rank);
+        return;
+    }
+
     printf("(");
     for(int r = 0; r < vector->shape[0]; r ++) {
         if(r < vector->shape[0] - 1) printf("%f,", get_value(vector, r));
@@ -727,6 +746,11 @@ void print_vector(Vector* vector) {
 
 void print_matrix(Matrix* matrix) {
 
+    if(matrix->rank != 2) {
+        printf("Matrix rank %d. Expected rank 2.\n", matrix->rank);
+        return;
+    }
+
     for(int r = 0; r < matrix->shape[0]; r ++) {
         for(int c = 0; c < matrix->shape[1]; c ++) {
             printf("%f ", get_value(matrix, r, c));
@@ -735,28 +759,63 @@ void print_matrix(Matrix* matrix) {
     }
 }
 
-void print_tensor(Tensor* tensor) {
+void print_tensor_rank3(Tensor* tensor) {
 
-    int shape[4] = {1, 1, 1, 1};
-    for(int i = 0; i < tensor->rank; i ++)
-        shape[i] = tensor->shape[i];
+    if(tensor->rank != 3) {
+        printf("Tensor rank %d. Expected rank 3.\n", tensor->rank);
+        return;
+    }
 
-    for(uint8_t t = 0; t < shape[3]; t ++) {
-        for(uint8_t r = 0; r < shape[0]; r ++) {
+    for(int d = 0; d < tensor->shape[2]; d ++) {
+        for(int r = 0; r < tensor->shape[0]; r ++) {
+            for(int c = 0; c < tensor->shape[1]; c ++) {
+                printf("%f ", get_value(tensor, r, c, d));
+            }
+            printf("\n");
+        }
+        printf("\n");
+    }
+}
 
-            for(uint8_t k = 0; k < shape[2]; k ++) {
-                for(uint8_t c = 0; c < shape[1]; c ++) {
+void print_tensor_rank4(Tensor* tensor) {
 
-                    if(tensor->rank == 1)
-                        printf("%f ", get_value(tensor, r));
-                    else
-                        printf("%f ", get_value(tensor, c, r, k, t));
+    if(tensor->rank != 4) {
+        printf("Tensor rank %d. Expected rank 4.\n", tensor->rank);
+        return;
+    }
+
+    for(uint8_t t = 0; t < tensor->shape[3]; t ++) {
+        for(uint8_t r = 0; r < tensor->shape[0]; r ++) {
+
+            for(uint8_t d = 0; d < tensor->shape[2]; d ++) {
+                for(uint8_t c = 0; c < tensor->shape[1]; c ++) {
+
+                    printf("%f ", get_value(tensor, c, r, d, t));
                 }
                 printf("\t");
             }
             printf("\n");
         }
         printf("\n");
+    }
+}
+
+void print_tensor(Tensor* tensor) {
+
+    int length = 1;
+
+    printf("Tensor shape = (");
+    for(int i = 0; i < tensor->rank; i ++) {
+        length *= tensor->shape[i];
+
+        if(i < tensor->rank - 1) printf("%d,", tensor->shape[i]);
+        else printf("%d)\n", tensor->shape[i]);
+    }
+
+    printf("Data (column-major order) = [");
+    for(int i = 0; i < length; i ++) {
+        if(i < length - 1) printf("%f,", tensor->data[i]);
+        else printf("%f]\n", tensor->data[i]);
     }
 }
 
