@@ -1,6 +1,6 @@
 # tensor
 
-Tensor algebra library in a single header file in C11 for `graphics programming`, `machine and deep learning` and `physics`.
+[Tensor algebra](https://en.wikipedia.org/wiki/Tensor_algebra) library in a single header file in C11 for `graphics programming`, `machine and deep learning` and `physics`.
 
 <img align="right" width="220px" height="201px" src="img/tensor.png"/>
 
