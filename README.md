@@ -3,21 +3,17 @@
 Tensor algebra library in a single header file in C11 for `graphics programming`, `machine` and `deep learning` and `physics`.
 > Still under development.
 
-<table>
-    <tr>
-        <td>
-            <ul>
-                <li>Vectors, matrices, rank 3 and higher rank tensors.</li>
-                <li>Linear algebra and tensor algebra operations.</li>
-                <li>Pure C code, easy to integrate in C++ or other languajes using bindings.</li>
-                <li>Only one header file.</li>
-            </ul>
-        <td>
-        <td><img src="img/tensor.png"/></td>
-    </tr>
-</table>
+<img align = "right" src="img/tensor.png"/>
 
-Take a look at [tensor wiki](https://github.com/MorcilloSanz/tensor/wiki) for reading the docs.
+* Vectors, matrices, rank 3 and higher rank tensors.
+
+* Linear algebra and tensor algebra operations.
+
+* Pure C code, easy to integrate in C++ or other languajes using bindings.
+
+* Only one header file.
+
+* Take a look at [tensor wiki](https://github.com/MorcilloSanz/tensor/wiki) for reading the docs.
 
 ## Transform vector example
 ```c
