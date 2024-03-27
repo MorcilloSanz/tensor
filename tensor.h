@@ -55,6 +55,16 @@ typedef struct Tensor Tensor;
 Tensor* create_tensor(uint8_t rank, ...);
 
 /**
+ * @brief Creates a tensor.
+ * 
+ * @param rank rank of the tensor.
+ * @param shape the shape of the tensor.
+ * 
+ * @return The tensor.
+*/
+Tensor* create_tensor_byptr(uint8_t rank, int* shape);
+
+/**
  * @brief Creates a vector.
  * 
  * @param n n number of elements.
@@ -120,6 +130,23 @@ void set_value(Tensor* tensor, double value, ...);
 double get_value(Tensor* tensor, ...);
 
 /**
+ * @brief Sets a value at a given position of the tensor.
+ * 
+ * @param value the value.
+ * @param positions the positions.
+*/
+void set_byptr(Tensor* tensor, double value, int* positions);
+
+/**
+ * @brief Returns the value at a given position of the tensor.
+ * 
+ * @param positions the positions.
+ * 
+ * @return The value.
+*/
+double get_byptr(Tensor* tensor, int* positions);
+
+/**
  * @brief Returns the length of the data of the tensor.
  * 
  * @param tensor the tensor.
@@ -127,6 +154,16 @@ double get_value(Tensor* tensor, ...);
  * @return The length;
 */
 unsigned int get_length(Tensor* tensor);
+
+/**
+ * @brief Computes the transpose of a tensor. The dimensions
+ * dim0 and dim1 are swapped.
+ * 
+ * @param tensor the tensor.
+ * @param dim0 dimension 0
+ * @param dim1 dimension 1
+*/
+void transpose_tensor(Tensor* tensor, int dim0, int dim1);
 
 /**
  * @brief Computes the transpose of a matrix.
@@ -353,6 +390,21 @@ Tensor* create_tensor(uint8_t rank, ...) {
     return tensor;
 }
 
+Tensor* create_tensor_byptr(uint8_t rank, int* shape) {
+
+    Tensor* tensor = (Tensor*)malloc(sizeof(Tensor));
+
+    size_t length = 1;
+    for(int i = 0; i < rank; i ++) length *= shape[i];
+
+    tensor->rank = rank;
+    tensor->shape = shape;
+    tensor->data = (double*)malloc(sizeof(double) * length);
+    for(size_t i = 0; i < length; i ++) tensor->data[i] = 0.0;
+
+    return tensor;
+}
+
 Vector* create_vector(int n) {
     Vector* vector = create_tensor(1, n);
     return vector;
@@ -446,6 +498,38 @@ double get_value(Tensor* tensor, ...) {
     return value;
 }
 
+void set_byptr(Tensor* tensor, double value, int* positions) {
+
+    int index = 0;
+    for(int i = 0; i < tensor->rank; i ++) {
+
+        int subIndex = positions[i];
+        for(int j = 0; j < i; j ++) {
+            subIndex *= tensor->shape[j];
+        }
+
+        index += subIndex;
+    }
+
+    tensor->data[index] = value;
+}
+
+double get_byptr(Tensor* tensor, int* positions) {
+
+    int index = 0;
+    for(int i = 0; i < tensor->rank; i ++) {
+
+        int subIndex = positions[i];
+        for(int j = 0; j < i; j ++) {
+            subIndex *= tensor->shape[j];
+        }
+
+        index += subIndex;
+    }
+
+    return tensor->data[index];
+}
+
 unsigned int get_length(Tensor* tensor) {
 
     int length = 1;
@@ -455,22 +539,62 @@ unsigned int get_length(Tensor* tensor) {
     return length;
 }
 
-void transpose(Matrix* matrix) {
+void transpose_tensor(Tensor* tensor, int dim0, int dim1) {
 
-    Matrix* transposeMatrix = create_matrix(matrix->shape[1], matrix->shape[0]);
-
-    for(uint8_t r = 0; r < transposeMatrix->shape[0]; r ++){
-        for(uint8_t c = 0; c < transposeMatrix->shape[1]; c ++)
-            set_value(transposeMatrix, get_value(matrix, c, r), r, c);
+    if(tensor->rank == 2) {
+        transpose(tensor);
+        return;
     }
 
-    matrix->shape[0] = transposeMatrix->shape[0];
-    matrix->shape[1] = transposeMatrix->shape[1];
+    size_t length = 1;
+    int* shape = (int*)(malloc(sizeof(int) * tensor->rank));
 
-    for(uint8_t i = 0; i < matrix->shape[0] * matrix->shape[1]; i ++)
-        matrix->data[i] = transposeMatrix->data[i];
+    for(int i = 0; i < tensor->rank; i ++) {
+        if(i == dim0)       shape[dim0] = tensor->shape[dim1];
+        else if(i == dim1)  shape[dim1] = tensor->shape[dim0];
+        else                shape[i] = tensor->shape[i];
+        length *= tensor->shape[i];
+    }
 
-    destroy_tensor(transposeMatrix);
+    Tensor* transpose_tensor = create_tensor_byptr(tensor->rank, shape);
+    
+    int index = 0;
+    for(int i = tensor->rank - 1; i >= 0; i --) 
+        index += shape[i] * pow(10, i);
+
+    while(index >= 0) {
+
+        int* pos = (int*)malloc(sizeof(int) * tensor->rank);
+        int* initial_pos = (int*)malloc(sizeof(int) * tensor->rank);
+
+        for(int i = tensor->rank - 1; i >= 0; i --) {
+            pos[i] = index / pow(10, i);
+
+            if(i == dim0)       initial_pos[dim0] = pos[dim1];
+            else if(i == dim1)  initial_pos[dim1] = pos[dim0];
+            else                initial_pos[i] = pos[i];
+        }
+            
+        double value = get_byptr(tensor, initial_pos);
+        set_byptr(transpose_tensor, value, pos);
+
+        free(pos);
+        free(initial_pos);
+
+        index --;
+    }
+
+    for(int i = 0; i < tensor->rank; i ++)
+        tensor->shape[i] = transpose_tensor->shape[i];
+
+    for(int i = 0; i < length; i ++)
+        tensor->data[i] = transpose_tensor->data[i];
+
+    destroy_tensor(transpose_tensor);
+}
+
+void transpose(Matrix* matrix) {
+    transpose_tensor(matrix, 0, 1);
 }
 
 void sum_scalar(Tensor* tensor, double scalar) {
