@@ -704,6 +704,10 @@ void hadamard_product(Tensor* lhs, Tensor* rhs) {
 
 Tensor* tensor_product(Tensor* lhs, Tensor* rhs) {
 
+    Tensor* temp = lhs;
+    lhs = rhs;
+    rhs = temp;
+
     Tensor* tensor = (Tensor*)malloc(sizeof(Tensor));
     
     tensor->rank = lhs->rank + rhs->rank;
