@@ -49,19 +49,18 @@ destroy_tensor(matrix);
 destroy_tensor(inv);
 ```
 
-## Rank 3 tensor example
+## Tensor product example
 ```c
-Tensor* tensor = create_tensor_rank3(3, 3, 3);
-set_value(tensor, 1.0, 0, 0, 0);
-set_value(tensor, 2.0, 1, 1, 1);
-set_value(tensor, 3.0, 2, 2, 2);
+Matrix* A = create_indentity(3);
+set_value(A, 3.0, 1, 1);
 
-printf("Tensor shape = (");
-for(int i = 0; i < tensor->rank; i ++) {
-    if(i < tensor->rank - 1) printf("%d,", tensor->shape[i]);
-    else printf("%d)\n", tensor->shape[i]);
-}
+Matrix* B = create_indentity(2);
+product_scalar(B, 2.0);
 
-print_tensor_rank3(tensor);
-destroy_tensor(tensor);
-```
+Tensor* product = tensor_product(A, B);
+print_tensor_rank4(product);
+
+destroy_tensor(A);
+destroy_tensor(B);
+destroy_tensor(product);
+``` 
