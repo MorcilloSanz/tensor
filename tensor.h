@@ -221,15 +221,23 @@ void hadamard_product(Tensor* lhs, Tensor* rhs);
  * @brief Computes the tensor product between lhs tensor and rhs tensor.
  * @warning The result will be updated in the left tensor.
  * 
- * @param lhs left tensor
- * @param rhs right tensor
- * 
- * @pre lhs and rhs must be the same rank.
- * @pre only rank 1 and 2 tensors allowed.
+ * @param lhs left tensor.
+ * @param rhs right tensor.
  * 
  * @return The tensor product.
 */
 Tensor* tensor_product(Tensor* lhs, Tensor* rhs);
+
+/**
+ * @brief Computes the dyadic product between two vectors.
+ * @warning The result will be updated in the left vector.
+ * 
+ * @param lhs left vector.
+ * @param rhs right vector.
+ * 
+ * @return The dyadic product.
+*/
+Tensor* dyadic_product(Vector* lhs, Vector* rhs);
 
 /**
  * @brief Calculates the dot product between lhs and rhs tensors.
@@ -741,6 +749,10 @@ Tensor* tensor_product(Tensor* lhs, Tensor* rhs) {
     }
 
     return tensor;
+}
+
+Tensor* dyadic_product(Vector* lhs, Vector* rhs) {
+    return tensor_product(lhs, rhs);
 }
 
 double dot_product(Tensor* lhs, Tensor* rhs) {
