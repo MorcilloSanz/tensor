@@ -731,28 +731,48 @@ Tensor* tensor_product(Tensor* lhs, Tensor* rhs) {
 
     tensor->data = (double*)malloc(sizeof(double) * length_lhs * length_rhs);
 
-    unsigned int index = 0;
+    int** lhs_positions = get_positions(lhs->shape, lhs->rank);
     for(int i = 0; i < length_lhs; i ++) {
 
+        int* lhs_position = lhs_positions[i];
+
         Tensor* subtensor = create_copy(rhs);
-        product_scalar(subtensor, lhs->data[i]);
+        product_scalar(subtensor, get_byptr(lhs, lhs_position));
 
+        int** rhs_positions = get_positions(rhs->shape, rhs->rank);
         for(int j = 0; j < length_rhs; j ++) {
-            
-            double value = subtensor->data[j];
-            tensor->data[index] = value;
 
-            index ++;
+            int* rhs_position = rhs_positions[j];
+
+            int* pos = (int*)malloc(sizeof(int) * (lhs->rank + rhs->rank));
+            for(int k = 0; k < lhs->rank + rhs->rank; k ++) {
+                if(k < lhs->rank) pos[k] = lhs_position[k];
+                else pos[k] = rhs_position[k - lhs->rank];
+            }
+
+            double value = get_byptr(subtensor, rhs_position);
+            set_byptr(tensor, value, pos);
+
+            free(rhs_position);
+            free(pos);
         }
 
         destroy_tensor(subtensor);
+
+        free(lhs_position);
+        free(rhs_positions);
     }
 
+    free(lhs_positions);
     return tensor;
 }
 
 Tensor* dyadic_product(Vector* lhs, Vector* rhs) {
-    return tensor_product(lhs, rhs);
+    
+    Tensor* product = tensor_product(lhs, rhs);
+    transpose(product);
+
+    return product;
 }
 
 double dot_product(Tensor* lhs, Tensor* rhs) {
